@@ -35,7 +35,7 @@ pipeline {
         stage('Docker Login') {
             steps {
                 sh """
-                    echo 'admin123' | docker login ${REGISTRY} -u admin --password-stdin
+                    echo 'user' | docker login ${REGISTRY} -u user --password-stdin
                 """
             }
         }
@@ -89,7 +89,7 @@ pipeline {
         stage('Pull images from Nexus') {
             steps {
                 sh """
-                    echo 'admin123' | docker login localhost:8081 -u admin --password-stdin
+                    echo 'user' | docker login localhost:8081 -u user --password-stdin
                     docker-compose pull
                 """
             }
