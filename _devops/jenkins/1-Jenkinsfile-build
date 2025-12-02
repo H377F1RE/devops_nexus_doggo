@@ -97,7 +97,7 @@ pipeline {
         stage('Compose Up') {
             steps {
                 dir(env.SHARED_WS) {
-                    sh 'docker compose up -d --build'
+                    sh 'docker compose up -d'
                 }
             }
         }

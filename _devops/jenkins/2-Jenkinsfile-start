@@ -13,10 +13,7 @@ pipeline {
         stage('Pull images from Nexus') {
             steps {
                 dir(env.SHARED_WS) {
-                    sh """
-                        echo 'user' | docker login localhost:8081 -u user --password-stdin
-                        docker-compose pull
-                    """
+                    sh 'docker-compose pull'
                 }
             }
         }
@@ -24,7 +21,7 @@ pipeline {
         stage('Compose Up') {
             steps {
                 dir(env.SHARED_WS) {
-                    sh 'docker compose up -d --build'
+                    sh 'docker compose up -d'
                 }
             }
         }
