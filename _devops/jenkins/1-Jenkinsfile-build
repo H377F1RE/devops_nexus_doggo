@@ -1,0 +1,112 @@
+pipeline {
+    agent any
+    
+    options {
+        skipDefaultCheckout(true)
+    }
+
+    environment {
+        SHARED_WS = '/var/jenkins_home/workspace/doggo_nexus'
+
+        REGISTRY = "localhost:8081"
+        IMAGE_RANDOM = "doggo-random-service"
+        IMAGE_RATING = "doggo-rating-service"
+        VERSION = "latest"
+    }
+
+    stages {
+        stage('Prepare WS') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh 'docker compose -f ./_devops/docker_compose/docker-compose.yaml down || true'
+                    cleanWs()
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                dir(env.SHARED_WS) {
+                    checkout scm
+                }
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                sh """
+                    echo 'admin123' | docker login ${REGISTRY} -u admin --password-stdin
+                """
+            }
+        }
+
+        stage('Build DogRandomService') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh """
+                        cd DogRandomService
+                        docker build -t ${REGISTRY}/${IMAGE_RANDOM}:${VERSION} .
+                    """
+                }
+                
+            }
+        }
+
+        stage('Build DogRatingService') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh """
+                        cd DogRatingService
+                        docker build -t ${REGISTRY}/${IMAGE_RATING}:${VERSION} .
+                    """
+                }
+                
+            }
+        }
+
+        stage('Push images to Nexus') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh """
+                        docker push ${REGISTRY}/${IMAGE_RANDOM}:${VERSION}
+                        docker push ${REGISTRY}/${IMAGE_RATING}:${VERSION}
+                    """
+                }
+            }
+        }
+
+        stage('Remove local images') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh """
+                        docker rmi ${REGISTRY}/${IMAGE_RANDOM}:${VERSION} || true
+                        docker rmi ${REGISTRY}/${IMAGE_RATING}:${VERSION} || true
+                    """
+                }
+            }
+        }
+
+        stage('Pull images from Nexus') {
+            steps {
+                sh """
+                    echo 'admin123' | docker login localhost:8081 -u admin --password-stdin
+                    docker-compose pull
+                """
+            }
+        }
+
+        stage('Compose Up') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh 'docker compose up -d --build'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh "docker logout ${REGISTRY}"
+        }
+    }
+}
