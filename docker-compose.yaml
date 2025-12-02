@@ -1,20 +1,16 @@
 services:
   doggo:
-    build:
-      context: ./DogRandomService
-      dockerfile: Dockerfile
+    image: localhost:8081/dog-random-service:latest
     env_file:
       - .env
     ports:
-      - "5000:8080"
+      - "3000:8080"
     depends_on:
       postgres:
         condition: service_healthy
   
   doggo_rating:
-    build:
-      context: ./DogRatingService
-      dockerfile: Dockerfile
+    image: localhost:8081/dog-rating-service:latest
     env_file:
       - .env
     ports:
@@ -39,3 +35,7 @@ services:
 
 volumes:
   postgres-data:
+
+
+        IMAGE_RANDOM = "doggo-random-service"
+        IMAGE_RATING = "doggo-rating-service"

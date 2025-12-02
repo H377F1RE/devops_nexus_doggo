@@ -18,7 +18,7 @@ pipeline {
         stage('Prepare WS') {
             steps {
                 dir(env.SHARED_WS) {
-                    sh 'docker compose -f ./_devops/docker_compose/docker-compose.yaml down || true'
+                    sh 'docker compose down || true'
                     cleanWs()
                 }
             }
