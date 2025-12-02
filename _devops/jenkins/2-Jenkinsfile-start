@@ -7,9 +7,35 @@ pipeline {
 
     environment {
         SHARED_WS = '/var/jenkins_home/workspace/doggo_nexus'
+        REGISTRY = "localhost:5000"
     }
 
     stages {
+        stage('Prepare WS') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh 'docker compose down || true'
+                    cleanWs()
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                dir(env.SHARED_WS) {
+                    checkout scm
+                }
+            }
+        }
+        
+        stage('Docker Login') {
+            steps {
+                sh """
+                    echo 'user' | docker login ${REGISTRY} -u user --password-stdin
+                """
+            }
+        }
+
         stage('Pull images from Nexus') {
             steps {
                 dir(env.SHARED_WS) {
@@ -29,7 +55,7 @@ pipeline {
 
     post {
         always {
-            sh "docker logout localhost:8081"
+            sh "docker logout ${REGISTRY}"
         }
     }
 }
