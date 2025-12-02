@@ -88,10 +88,9 @@ pipeline {
 
         stage('Pull images from Nexus') {
             steps {
-                sh """
-                    echo 'user' | docker login localhost:8081 -u user --password-stdin
-                    docker-compose pull
-                """
+                dir(env.SHARED_WS) {
+                    sh 'docker-compose pull'
+                }
             }
         }
 
