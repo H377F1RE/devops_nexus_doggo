@@ -1,6 +1,6 @@
 services:
   doggo:
-    image: localhost:8081/dog-random-service:latest
+    image: localhost:5000/dog-random-service:latest
     env_file:
       - .env
     ports:
@@ -10,7 +10,7 @@ services:
         condition: service_healthy
   
   doggo_rating:
-    image: localhost:8081/dog-rating-service:latest
+    image: localhost:5000/dog-rating-service:latest
     env_file:
       - .env
     ports:

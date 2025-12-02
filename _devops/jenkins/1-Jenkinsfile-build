@@ -8,7 +8,7 @@ pipeline {
     environment {
         SHARED_WS = '/var/jenkins_home/workspace/doggo_nexus'
 
-        REGISTRY = "localhost:8081"
+        REGISTRY = "localhost:5000"
         IMAGE_RANDOM = "doggo-random-service"
         IMAGE_RATING = "doggo-rating-service"
         VERSION = "latest"
