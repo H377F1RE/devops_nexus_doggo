@@ -35,7 +35,3 @@ services:
 
 volumes:
   postgres-data:
-
-
-        IMAGE_RANDOM = "doggo-random-service"
-        IMAGE_RATING = "doggo-rating-service"

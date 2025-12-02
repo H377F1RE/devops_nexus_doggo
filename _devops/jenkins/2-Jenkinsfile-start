@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    options {
+        skipDefaultCheckout(true)
+    }
+
+    environment {
+        SHARED_WS = '/var/jenkins_home/workspace/doggo_nexus'
+    }
+
+    stages {
+        stage('Pull images from Nexus') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh """
+                        echo 'user' | docker login localhost:8081 -u user --password-stdin
+                        docker-compose pull
+                    """
+                }
+            }
+        }
+
+        stage('Compose Up') {
+            steps {
+                dir(env.SHARED_WS) {
+                    sh 'docker compose up -d --build'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            sh "docker logout localhost:8081"
+        }
+    }
+}
